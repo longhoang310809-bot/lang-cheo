@@ -37,15 +37,21 @@ export const GameSection: React.FC<GameSectionProps> = ({
   const [chatMessage, setChatMessage] = useState('');
   const [showCluesBag, setShowCluesBag] = useState(false);
 
-  const eventFeedEndRef = useRef<HTMLDivElement>(null);
+  const eventFeedRef = useRef<HTMLDivElement>(null);
 
   // Avatars options
   const avatars = ['🎭', '🌸', '🪷', '🎋', '📜', '🪘', '🪭', '🏮'];
 
-  // Scroll event feed to bottom
+  // Scroll only the event diary itself to the newest event.
+  // Using scrollIntoView() here could also move the whole page.
   useEffect(() => {
-    if (eventFeedEndRef.current) {
-      eventFeedEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    const feed = eventFeedRef.current;
+
+    if (feed) {
+      feed.scrollTo({
+        top: feed.scrollHeight,
+        behavior: 'smooth',
+      });
     }
   }, [gameRoom?.events]);
 
@@ -975,7 +981,10 @@ export const GameSection: React.FC<GameSectionProps> = ({
               <span className="text-[10px] text-stone-500 font-mono">{gameRoom.events.length} sự kiện</span>
             </div>
 
-            <div className="overflow-y-auto space-y-2 pr-1 flex-1 text-xs max-h-[240px]">
+            <div
+              ref={eventFeedRef}
+              className="overflow-y-auto space-y-2 pr-1 flex-1 text-xs max-h-[240px]"
+            >
               {gameRoom.events.map((ev) => (
                 <div
                   key={ev.id}
@@ -991,7 +1000,6 @@ export const GameSection: React.FC<GameSectionProps> = ({
                   {ev.text}
                 </div>
               ))}
-              <div ref={eventFeedEndRef} />
             </div>
 
             {/* Quick Dialogue Input */}
